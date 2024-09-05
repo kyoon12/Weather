@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Weather Update </title>
+    
+</head>
+<body> 
+    <h1>Weather Update</h1>
+    
+    <div id="search">
+        <input type="text" id="cityInput" placeholder="Enter city name">
+        <button id="searchButton">Get Weather</button>
+    </div>
+    
+    <div id="weather"></div>
+  
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const apiKey = 'ac868d11106a43eda8603246242208';
+            const searchButton = document.getElementById('searchButton');
+            const cityInput = document.getElementById('cityInput');
+            const weatherContainer = document.getElementById('weather');
+
+            async function fetchWeather(cityName) {
+                const apiEndpoint = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${cityName}&days=3`;
+
+                try {
+                    const response = await fetch(apiEndpoint);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const weatherData = await response.json();
+                    console.log(weatherData);
+
+                    weatherContainer.innerHTML = `
+                        <h2>${cityName} Weather Forecast</h2>
+                    `;
+
+                    weatherData.forecast.forecastday.forEach(element => {
+                        weatherContainer.innerHTML += `
+                            <div class="weather-up">
+                                <h3>${element.date}</h3>
+                                <p><img src="https:${element.day.condition.icon}" alt="${element.day.condition.text}"></p>
+                                <p><strong>Temperature:</strong> ${element.day.avgtemp_c}°C</p>
+                                <p><strong>Weather:</strong> ${element.day.condition.text}</p>
+                                <p><strong>Humidity:</strong> ${element.day.avghumidity}%</p>
+                            </div>
+                        `;
+                    });
+
+                } catch (error) {
+                    weatherContainer.innerHTML = `<p>Unable to retrieve weather data: ${error.message}</p>`;
+                }
+            }
+
+            searchButton.addEventListener('click', function() {
+                const cityName = cityInput.value.trim();
+                if (cityName) {
+                    fetchWeather(cityName);
+                } else {
+                    weatherContainer.innerHTML = '<p>Please enter a city name.</p>';
+                }
+            });
+
+            fetchWeather('Iligan');
+        });
+    </script>
+
+    <div class="footer">
+        <p>Jhon Lloyd Soco - 8/23/24</p>
+    </div>
+</body>
+</html>
